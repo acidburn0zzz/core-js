@@ -1,4 +1,8 @@
-/* eslint-disable no-script-url */
+// Copyright © web-platform-tests contributors
+// Originally from https://github.com/web-platform-tests/wpt
+// Available under the 3-Clause BSD License https://github.com/web-platform-tests/wpt/blob/master/LICENSE.md
+
+/* eslint-disable no-script-url -- required for testing */
 export default [
   '# Based on http://trac.webkit.org/browser/trunk/LayoutTests/fast/url/script-tests/segments.js',
   {
@@ -4425,7 +4429,7 @@ export default [
     failure: true,
   },
   {
-    input: 'sc://te@s:t@/',
+    input: 'sc://tes@s:t@/',
     base: 'about:blank',
     failure: true,
   },

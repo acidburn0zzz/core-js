@@ -1,5 +1,4 @@
 npm-shrinkwrap.json
-package-lock.json
 yarn.lock
 node_modules/
 *.tmp
@@ -7,6 +6,10 @@ node_modules/
 *.bak
 *.swp
 
+/packages/core-js/features/
+/packages/core-js/es/index.js
+/packages/core-js/full/index.js
+/packages/core-js/stable/index.js
 /packages/core-js/LICENSE
 /packages/core-js-builder/LICENSE
 /packages/core-js-bundle/LICENSE
@@ -20,8 +23,10 @@ node_modules/
 /packages/core-js-compat/external.json
 /packages/core-js-compat/modules.json
 /packages/core-js-compat/modules-by-versions.json
+/packages/core-js-pure/actual/
 /packages/core-js-pure/es/
 /packages/core-js-pure/features/
+/packages/core-js-pure/full/
 /packages/core-js-pure/internals/
 /packages/core-js-pure/modules/
 /packages/core-js-pure/proposals/
@@ -32,4 +37,8 @@ node_modules/
 /packages/core-js-pure/index.js
 /packages/core-js-pure/configurator.js
 /packages/core-js-pure/postinstall.js
-/tests/bundles/
+/tests/**/bundles/
+/tests/compat/*.jar
+/tests/compat/compat-data.js
+/tests/unit-global/index.js
+/tests/unit-pure/index.js

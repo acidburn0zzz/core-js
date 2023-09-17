@@ -1,12 +1,13 @@
 'use strict';
 importScripts('../../packages/core-js-bundle/index.js');
 
-postMessage(typeof core !== 'undefined');
+postMessage(typeof core != 'undefined');
 
-setImmediate(() => {
+setImmediate(function () {
   postMessage('setImmediate');
 });
 
-Promise.resolve().then(() => {
+// eslint-disable-next-line es/no-promise -- safe
+Promise.resolve().then(function () {
   postMessage('Promise.resolve');
 });

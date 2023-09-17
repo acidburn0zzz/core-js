@@ -1,10 +1,12 @@
 'use strict';
-const worker = new Worker('./worker/runner.js');
-worker.addEventListener('error', e => {
-  // eslint-disable-next-line no-console
+var worker = new Worker('./worker/runner.js');
+
+worker.addEventListener('error', function (e) {
+  // eslint-disable-next-line no-console -- output
   console.error(e);
 });
-worker.addEventListener('message', message => {
-  // eslint-disable-next-line no-console
+
+worker.addEventListener('message', function (message) {
+  // eslint-disable-next-line no-console -- output
   console.log(message.data);
 });

@@ -2,12 +2,12 @@
 const { version } = require('./package');
 
 module.exports = {
-  /* eslint-disable prefer-template */
+  /* eslint-disable prefer-template -- for better formatting */
   banner: '/**\n' +
           ' * core-js ' + version + '\n' +
-          ' * https://github.com/zloirock/core-js\n' +
-          ' * License: http://rock.mit-license.org\n' +
-          ' * © ' + new Date().getFullYear() + ' Denis Pushkarev (zloirock.ru)\n' +
+          ' * © 2014-2023 Denis Pushkarev (zloirock.ru)\n' +
+          ' * license: https://github.com/zloirock/core-js/blob/v' + version + '/LICENSE\n' +
+          ' * source: https://github.com/zloirock/core-js\n' +
           ' */',
-  /* eslint-enable prefer-template */
+  /* eslint-enable prefer-template -- for better formatting */
 };
