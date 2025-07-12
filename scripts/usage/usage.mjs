@@ -14,24 +14,24 @@ const start = Date.now();
 let tested = 0;
 let withCoreJS = 0;
 
-echo(green('downloading and parsing T1M Alexa data, depending on AWS cloud speed it could take from some seconds to some minutes'));
-const response = await fetch('https://s3.amazonaws.com/alexa-static/top-1m.csv.zip');
-const archive = await jszip.loadAsync(await response.arrayBuffer());
-// https://s3.amazonaws.com/alexa-static/top-1m.csv.zip is no longer provided, renamed and contains a deprecation message
+echo(green('downloading and parsing T1M Alexa data, it could take some seconds'));
+// https://s3.amazonaws.com/alexa-static/top-1m.csv.zip is no longer provided, so using the last copy of the dataset from my server
 // here could be used, for example, Cisco Umbrella statistics - http://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip,
 // however, it's not so relative to our case like the Alexa list
 // makes sense take a look at https://github.com/PeterDaveHello/top-1m-domains
+const response = await fetch('http://es6.zloirock.ru/top-1m.csv.zip');
+const archive = await jszip.loadAsync(await response.arrayBuffer());
 const file = await archive.file('top-1m.csv.deprecated').async('string');
 const BANNER_LINES = 8;
 const sites = file
-  .split('\n')
-  .slice(BANNER_LINES, limit + BANNER_LINES)
+  .split('\n', limit + BANNER_LINES)
+  .slice(BANNER_LINES)
   .map(line => line.match(/^\d+,(?<site>.+)$/).groups.site)
   .reverse();
 echo(green(`downloading and parsing the rank took ${ cyan((Date.now() - start) / 1e3) } seconds\n${ gray('-'.repeat(120)) }`));
 
 function timeout(promise, time) {
-  return Promise.race([promise, new Promise((resolve, reject) => setTimeout(() => reject(Error('timeout')), time))]);
+  return Promise.race([promise, new Promise((resolve, reject) => setTimeout(() => reject(new Error('timeout')), time))]);
 }
 
 chromium.use(StealthPlugin());

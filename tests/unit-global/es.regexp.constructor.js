@@ -3,6 +3,8 @@
 import { DESCRIPTORS, GLOBAL } from '../helpers/constants.js';
 import { nativeSubclass } from '../helpers/helpers.js';
 
+const { getPrototypeOf } = Object;
+
 if (DESCRIPTORS) {
   QUnit.test('RegExp constructor', assert => {
     const Symbol = GLOBAL.Symbol || {};
@@ -80,7 +82,17 @@ if (DESCRIPTORS) {
     // eslint-disable-next-line regexp/no-unused-capturing-group -- required for testing
     assert.same(RegExp('(b)').exec('b').groups, undefined, 'NCG #2');
     const { groups } = RegExp('foo:(?<foo>\\w+),bar:(?<bar>\\w+)').exec('foo:abc,bar:def');
+    assert.same(getPrototypeOf(groups), null, 'null prototype');
     assert.deepEqual(groups, { foo: 'abc', bar: 'def' }, 'NCG #3');
+    // eslint-disable-next-line regexp/no-useless-non-capturing-group -- required for testing
+    const { groups: nonCaptured, length } = RegExp('foo:(?:value=(?<foo>\\w+)),bar:(?:value=(?<bar>\\w+))').exec('foo:value=abc,bar:value=def');
+    assert.deepEqual(nonCaptured, { foo: 'abc', bar: 'def' }, 'NCG #4');
+    assert.same(length, 3, 'incorrect number of matched entries #1');
+
+    // eslint-disable-next-line regexp/no-unused-capturing-group -- required for testing
+    const { groups: skipBar } = RegExp('foo:(?<foo>\\w+),bar:(\\w+),buz:(?<buz>\\w+)').exec('foo:abc,bar:def,buz:ghi');
+    assert.deepEqual(skipBar, { foo: 'abc', buz: 'ghi' }, 'NCG #5');
+
     // fails in Safari
     // assert.same(Object.getPrototypeOf(groups), null, 'NCG #4');
     assert.same('foo:abc,bar:def'.replace(RegExp('foo:(?<foo>\\w+),bar:(?<bar>\\w+)'), '$<bar>,$<foo>'), 'def,abc', 'replace #1');

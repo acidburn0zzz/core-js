@@ -14,7 +14,9 @@ export const GLOBAL = Function('return this')();
 
 export const NATIVE = GLOBAL.NATIVE || false;
 
-export const NODE = Object.prototype.toString.call(GLOBAL.process).slice(8, -1) === 'process';
+export const NODE = typeof Bun == 'undefined' && Object.prototype.toString.call(GLOBAL.process).slice(8, -1) === 'process';
+
+export const BUN = typeof Bun != 'undefined' && Object.prototype.toString.call(GLOBAL.process).slice(8, -1) === 'process';
 
 const $TYPED_ARRAYS = {
   Float32Array: 4,
@@ -55,6 +57,7 @@ export const LITTLE_ENDIAN = (() => {
   }
 })();
 
+// eslint-disable-next-line es/no-object-setprototypeof -- detection
 export const PROTO = !!Object.setPrototypeOf || '__proto__' in Object.prototype;
 
 export let REDEFINABLE_PROTO = false;
@@ -73,6 +76,7 @@ export const STRICT = !STRICT_THIS;
 
 export const FREEZING = !function () {
   try {
+    // eslint-disable-next-line es/no-object-isextensible, es/no-object-preventextensions -- detection
     return Object.isExtensible(Object.preventExtensions({}));
   } catch {
     return true;
@@ -83,6 +87,7 @@ export const CORRECT_PROTOTYPE_GETTER = !function () {
   try {
     function F() { /* empty */ }
     F.prototype.constructor = null;
+    // eslint-disable-next-line es/no-object-getprototypeof -- detection
     return Object.getPrototypeOf(new F()) !== F.prototype;
   } catch {
     return true;
@@ -99,3 +104,9 @@ export const REDEFINABLE_ARRAY_LENGTH_DESCRIPTOR = DESCRIPTORS && !function () {
 }();
 
 export const WHITESPACES = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+// eslint-disable-next-line es/no-number-maxsafeinteger -- safe
+export const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
+
+// eslint-disable-next-line es/no-number-minsafeinteger -- safe
+export const MIN_SAFE_INTEGER = Number.MIN_SAFE_INTEGER || -9007199254740991;

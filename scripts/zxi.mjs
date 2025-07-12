@@ -1,9 +1,8 @@
-const { delimiter, dirname, normalize } = path;
+const { dirname, resolve } = path;
 const { pathExists } = fs;
 const { cwd, env } = process;
 const { _: args } = argv;
 const { cyan, green } = chalk;
-const ROOT = cwd();
 const CD = args.includes('cd');
 const TIME = args.includes('time');
 
@@ -13,24 +12,21 @@ if (TIME) args.splice(args.indexOf('time'), 1);
 const FILE = args.shift();
 const DIR = dirname(FILE);
 
-if (await pathExists(`${ DIR }/package.json`)) {
-  cd(DIR);
+$.verbose = true;
 
-  // after fixing the npm bug, use `--prefix ${ DIR }` instead of extra `cd`
-  // https://github.com/npm/cli/issues/4819
-  await $`npm install \
+if (await pathExists(`${ DIR }/package.json`)) {
+  await $({ cwd: DIR })`npm install \
     --no-audit \
     --no-fund \
     --lockfile-version=3 \
     --loglevel=error \
+    --force \
   `;
 
-  const BIN = normalize(`${ cwd() }/node_modules/.bin`);
+  $.preferLocal = [resolve(DIR), cwd()];
+}
 
-  if (await pathExists(BIN)) env.PATH = `${ BIN }${ delimiter }${ env.PATH }`;
-
-  if (!CD) cd(ROOT);
-} else if (CD) cd(DIR);
+if (CD) cd(DIR);
 
 env.FORCE_COLOR = '1';
 

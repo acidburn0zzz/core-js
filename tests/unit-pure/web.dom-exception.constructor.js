@@ -24,13 +24,14 @@ const errors = {
   NetworkError: { s: 'NETWORK_ERR', c: 19, m: 1 },
   AbortError: { s: 'ABORT_ERR', c: 20, m: 1 },
   URLMismatchError: { s: 'URL_MISMATCH_ERR', c: 21, m: 1 },
-  QuotaExceededError: { s: 'QUOTA_EXCEEDED_ERR', c: 22, m: 1 },
+  // https://github.com/whatwg/webidl/pull/1465
+  // QuotaExceededError: { s: 'QUOTA_EXCEEDED_ERR', c: 22, m: 1 },
   TimeoutError: { s: 'TIMEOUT_ERR', c: 23, m: 1 },
   InvalidNodeTypeError: { s: 'INVALID_NODE_TYPE_ERR', c: 24, m: 1 },
   DataCloneError: { s: 'DATA_CLONE_ERR', c: 25, m: 1 },
 };
 
-const HAS_STACK = 'stack' in Error('1');
+const HAS_STACK = 'stack' in new Error('1');
 
 QUnit.test('DOMException', assert => {
   assert.isFunction(DOMException);
@@ -67,6 +68,7 @@ QUnit.test('DOMException', assert => {
     assert.same(DOMException.prototype[errors[name].s], errors[name].c, `DOMException.prototype.${ errors[name].s }`);
   }
 
+  // eslint-disable-next-line sonarjs/inconsistent-function-call -- required for testing
   assert.throws(() => DOMException(42, 'DataCloneError'), "DOMException(42, 'DataCloneError')");
   const symbol = Symbol('DOMException constructor test');
   assert.throws(() => new DOMException(symbol, 'DataCloneError'), "new DOMException(Symbol(), 'DataCloneError')");

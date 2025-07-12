@@ -9,15 +9,20 @@ There is always some ["help wanted" issues](https://github.com/zloirock/core-js/
 ## How to add a new polyfill
 
 - The polyfill implementation should be added to the [`packages/core-js/modules`](./packages/core-js/modules) directory.
+- The polyfill should properly work in ES3 and all possible engines. If in some engines it cannot be implemented (for example, it strictly requires more modern ES or unavailable platform features), it should not break any other `core-js` features or application in any way.
+- Avoid possible observing / breakage polyfills via patching built-ins at runtime: cache all global built-ins in the polyfills code and don't call prototype methods from instances.
 - Shared helpers should be added to the [`packages/core-js/internals`](./packages/core-js/internals) directory. Reuse already existing helpers.
-- For export the polyfill, in all common cases use `internals/export` helper. Use something else only if this helper is not applicable - for example, if you want to polyfill accessors.
-- If the code of the pure version implementation should significantly differ from the global version (*that's not a frequent situation, in most cases `internals/is-pure` is enough*), you can add it to [`packages/core-js-pure/override`](./packages/core-js-pure/override) directory. The rest parts of `core-js-pure` will be copied from `core-js` package.
+- Avoid direct import from `/modules/` path in `/internals|modules/` since it will break optimizations via Babel / `swc`. Specify such dependencies in `/es|stable|actual/full/` entries and use something like [`internals/get-built-in`](./packages/core-js/internals/get-built-in.js) helpers.
+- For export the polyfill, in all common cases use [`internals/export`](./packages/core-js/modules/export.js) helper. Use something else only if this helper is not applicable - for example, if you want to polyfill accessors.
+- If the code of the pure version implementation should significantly differ from the global version (*that's not a frequent situation, in most cases [`internals/is-pure`](./packages/core-js/modules/is-pure.js) constant is enough*), you can add it to [`packages/core-js-pure/override`](./packages/core-js-pure/override) directory. The rest parts of `core-js-pure` will be copied from `core-js` package.
 - Add the feature detection of the polyfill to [`tests/compat/tests.js`](./tests/compat/tests.js), add the compatibility data to [`packages/core-js-compat/src/data.mjs`](./packages/core-js-compat/src/data.mjs), how to do it [see below](#how-to-update-core-js-compat-data), and the name of the polyfill module to [`packages/core-js-compat/src/modules-by-versions.mjs`](./packages/core-js-compat/src/modules-by-versions.mjs) (this data is also used for getting the default list of polyfills at bundling and generation indexes).
 - Add it to entry points where it's required: directories [`packages/core-js/es`](./packages/core-js/es), [`packages/core-js/stable`](./packages/core-js/stable), [`packages/core-js/actual`](./packages/core-js/actual), [`packages/core-js/full`](./packages/core-js/full), [`packages/core-js/proposals`](./packages/core-js/proposals), [`packages/core-js/stage`](./packages/core-js/stage) and [`packages/core-js/web`](./packages/core-js/web).
 - Add unit tests to [`tests/unit-global`](./tests/unit-global) and [`tests/unit-pure`](./tests/unit-pure).
 - Add tests of entry points to [`tests/entries/unit.mjs`](./tests/entries/unit.mjs).
 - Make sure that you are following [our coding style](#style-and-standards) and [all tests](#testing) are passed.
 - Document it in [README.md](./README.md) and [CHANGELOG.md](./CHANGELOG.md).
+
+[A simple example of adding a new polyfill.](https://github.com/zloirock/core-js/pull/1294/files)
 
 ## How to update `core-js-compat` data
 
@@ -31,7 +36,7 @@ For updating `core-js-compat` data:
 - If you want to add new data for Deno, run `npm run compat-deno` with the installed required Deno version and you will see the results in the console. Use `npm run compat-deno json` if you want to get the result as JSON.
 - If you want to add new data for Bun, run `npm run compat-bun` with the installed required Bun version and you will see the results in the console.
 - If you want to add new data for Rhino, set the required Rhino version in `compat-rhino` NPM script in [`package.json`](./package.json), run `npm run compat-rhino` and you will see the results in the console.
-- If you want to add new data for Hermes (incl. shipped with React Native), run `npm run compat-hermes YOR_PATH_TO_HERMES` and you will see the results in the console.
+- If you want to add new data for Hermes (incl. shipped with React Native), run `npm run compat-hermes YOUR_PATH_TO_HERMES` and you will see the results in the console.
 - After getting this data, add it to [`packages/core-js-compat/src/data.mjs`](./packages/core-js-compat/src/data.mjs).
 - If you want to add new mapping (for example, to add a new iOS Safari version based on Safari or NodeJS based on Chrome), add it to [`packages/core-js-compat/src/mapping.mjs`](./packages/core-js-compat/src/mapping.mjs).
 
@@ -85,7 +90,7 @@ You can run parts of the test case separately:
   ```sh
   npm run lint
   ```
-- Unit test case in Karma (modern Chromium, Firefox, WebKit (Playwright) and ancient WebKit (PhantomJS)):
+- Unit test case in Karma (modern Chromium, Firefox, WebKit (Playwright), ancient WebKit (PhantomJS), IE11 (if available)):
   ```sh
   npx run-s prepare bundle test-unit-karma
   ```
@@ -93,7 +98,7 @@ You can run parts of the test case separately:
   ```sh
   npx run-s prepare bundle test-unit-node
   ```
-- Unit test case in Bun (it's not included in `npm t` since required installed Bun):
+- Unit test case in Bun:
   ```sh
   npx run-s prepare bundle test-unit-bun
   ```

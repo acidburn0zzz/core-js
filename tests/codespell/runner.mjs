@@ -7,7 +7,9 @@ const skip = [
 ];
 
 const ignoreWords = [
+  'aNumber',
   'larg',
+  'outLow',
   'statics',
 ];
 

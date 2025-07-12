@@ -16,7 +16,7 @@ const LICENSE = 'LICENSE';
 const README = 'README.md';
 const README_COMPAT = 'packages/core-js-compat/README.md';
 const README_DENO = 'deno/corejs/README.md';
-const SHARED = 'packages/core-js/internals/shared.js';
+const SHARED = 'packages/core-js/internals/shared-store.js';
 const BUILDER_CONFIG = 'packages/core-js-builder/config.js';
 const NOW = new Date();
 const CURRENT_YEAR = NOW.getFullYear();
@@ -53,14 +53,26 @@ for (const PATH of await glob('packages/*/package.json')) {
 }
 
 if (NEW_VERSION !== PREV_VERSION) {
+  const CURRENT_DATE = `${ CURRENT_YEAR }.${ String(NOW.getMonth() + 1).padStart(2, '0') }.${ String(NOW.getDate()).padStart(2, '0') }`;
+  const NUMBER_OF_COMMITS = Number(await $`git rev-list "v${ PREV_VERSION }"..HEAD --count`) + 1;
   const changelog = await readFile(CHANGELOG, 'utf8');
   await writeFile(CHANGELOG, changelog.replaceAll('##### Unreleased', `##### Unreleased\n- Nothing\n\n##### [${
     NEW_VERSION
   } - ${
-    CURRENT_YEAR }.${ String(NOW.getMonth() + 1).padStart(2, '0') }.${ String(NOW.getDate()).padStart(2, '0')
+    CURRENT_DATE
   }](https://github.com/zloirock/core-js/releases/tag/v${
     NEW_VERSION
-  })`));
+  })\n- Changes [v${
+    PREV_VERSION
+  }...v${
+    NEW_VERSION
+  }](https://github.com/zloirock/core-js/compare/v${
+    PREV_VERSION
+  }...v${
+    NEW_VERSION
+  }) (${
+    NUMBER_OF_COMMITS
+  } commits)`));
 }
 
 if (CURRENT_YEAR !== OLD_YEAR) echo(green('the year updated'));
@@ -69,4 +81,3 @@ else if (CURRENT_YEAR === OLD_YEAR) echo(red('bump is not required'));
 
 await $`npm run bundle-package deno`;
 await $`npm run build-compat`;
-await import('./copy-compat-table.mjs');
